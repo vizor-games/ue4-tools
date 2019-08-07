@@ -59,17 +59,17 @@ class Inspector:
 
     def inspectProject(self, projectRootPath):
         projectName = ue_path.get_project_name_from_path(projectRootPath)
-        logging.info("Project Name: " + projectName)
+        logging.info("Project Name: " + str(projectName))
         
         projectFilePath = ue_path.get_project_file_path_from_repo_path(projectRootPath)
         logging.debug("ProjectFilePath: " + str(projectFilePath))
 
         if projectFilePath and os.path.isfile(projectFilePath):
             engineId = ue_path.get_engine_id(projectFilePath)
-            logging.info("Engine Id: " + engineId)
+            logging.info("Engine Id: " + str(engineId))
             
             enginePath = ue_path.get_engine_path(projectFilePath)
-            logging.info("Engine Path: " + enginePath)
+            logging.info("Engine Path: " + str(enginePath))
 
             buildApps = ue_proj.get_project_build_apps(projectRootPath)
             logging.info("Build applications: " + str(buildApps))

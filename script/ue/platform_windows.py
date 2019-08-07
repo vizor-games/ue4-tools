@@ -8,6 +8,7 @@ from ue import path as ue_path
 
 INSTALLATION_SUB_KEY = "SOFTWARE\\Epic Games\\Unreal Engine\\Builds"
 EXE_EXTENSION = ".exe"
+RELATIVE_BUILD_FILE_PATH = "Engine/Build/BatchFiles/Build.bat"
 
 class UePlatformWindows(UePlatformBase):
     def get_application_settings_path(self):
@@ -61,3 +62,6 @@ class UePlatformWindows(UePlatformBase):
 
     def is_build_exe_file(self, filePath):
         return filePath.endswith(EXE_EXTENSION)
+
+    def get_relative_build_file_path(self):
+        return RELATIVE_BUILD_FILE_PATH

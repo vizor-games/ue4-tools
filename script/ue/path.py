@@ -3,17 +3,15 @@ import sys
 import logging
 import platform
 import json
-from ue import platform as pfm
+from ue import platform as ue_pfm
 from ue import project
-
 
 SOURCE_PATH = "Source"
 LOGS_PATH = "Saved/Logs"
 TARGET_FILE_ENDING = ".Target.cs"
 
-
 def get_engine_root_dir_from_identifier(identifier):
-    platformInterface = pfm.get_current_platform_interface()
+    platformInterface = ue_pfm.get_current_platform_interface()
     if not platformInterface:
         logging.error("Platform interface is None")
         return None
@@ -23,7 +21,7 @@ def get_engine_root_dir_from_identifier(identifier):
     return engineInstallations.get(identifier)
 
 def get_engine_identifier_from_root_dir(inRootDir):
-    platformInterface = pfm.get_current_platform_interface()
+    platformInterface = ue_pfm.get_current_platform_interface()
     if not platformInterface:
         logging.error("Platform interface is None")
         return None
@@ -97,7 +95,7 @@ def is_build_exe_file(filePath, platform=None):
     if platform:
         platformInterfaces = [platform]
     else:
-        platformInterfaces = list(pfm.get_all_platform_interfaces().values())
+        platformInterfaces = list(ue_pfm.get_all_platform_interfaces().values())
         if not platformInterfaces:
             logging.error("No platform interfaces")
             return False
@@ -131,7 +129,7 @@ def get_build_root_path_from_path(somePath, platform=None):
 
 def get_engine_id(projectFile):
     #EngineAssociation": "4.20"
-    platformInterface = pfm.get_current_platform_interface()
+    platformInterface = ue_pfm.get_current_platform_interface()
     if not platformInterface:
         logging.error("Platform interface is None")
         return None
@@ -158,3 +156,11 @@ def _get_child_dirs(somePath):
 
 def _get_files(somePath):
     return [fileName for fileName in os.listdir(somePath) if os.path.isfile(os.path.join(somePath, fileName))]
+
+def get_relative_build_file_path():
+    platformInterface = ue_pfm.get_current_platform_interface()
+    if not platformInterface:
+        logging.error("Platform interface is None")
+        return None
+
+    return platformInterface.get_relative_build_file_path()

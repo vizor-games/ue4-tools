@@ -13,12 +13,10 @@ from ue import project as ue_proj
 DEFAULT_APP = "Editor"
 DEFAULT_CONFIG = "Development"
 DEFAULT_PLATFORM = "Win64"
-RELATIVE_BUILD_FILE_PATH = "Engine/Build/BatchFiles/Build.bat"
 
 DISABLE_UNITY_BUILD_ARG = "-DisableUnity"
 NO_PCH_ARG = "-NoPCH"
 NO_SHARED_PCH_ARG = "-NoSharedPCH"
-
 
 def get_real_arg_values_list(argValue, allValue, dbgDescription):
     if type(argValue) is list:
@@ -58,7 +56,7 @@ class ProjectBuilder:
                 enginePath = ue_path.get_engine_path(projectFilePath)
                 logging.debug("EnginePath: " + str(enginePath))
                 if enginePath and os.path.isdir(enginePath):
-                    buildFilePath = os.path.normpath(os.path.join(enginePath, RELATIVE_BUILD_FILE_PATH))
+                    buildFilePath = os.path.normpath(os.path.join(enginePath, ue_path.get_relative_build_file_path()))
                     logging.debug("BuildFilePath: " + str(buildFilePath))
                     if buildFilePath and os.path.isfile(buildFilePath):
                         return buildFilePath, projectFilePath, appArg, configArg, platformArg

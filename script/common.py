@@ -6,8 +6,6 @@ import subprocess as sp
 from argparse import ArgumentParser
 import logging
 import json
-import win32api, win32con
-from ue import platform as pfm
 
 ConfigExtension = ".cfg"
 LogExtension = ".log"

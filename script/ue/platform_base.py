@@ -54,3 +54,6 @@ class UePlatformBase:
     def is_build_exe_file(self, filePath):
         logging.error("is_build_exe_file NOT IMPLEMENTED")
         return False
+
+    def get_relative_build_file_path(self):
+        raise NotImplementedError("Linux build is not implemented!")
