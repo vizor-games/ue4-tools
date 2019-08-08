@@ -9,6 +9,7 @@ from ue import project
 SOURCE_PATH = "Source"
 LOGS_PATH = "Saved/Logs"
 TARGET_FILE_ENDING = ".Target.cs"
+RELATIVE_VERSION_FILE_PATH = "Engine/Source/Runtime/Launch/Resources/Version.h"
 
 def get_engine_root_dir_from_identifier(identifier):
     platformInterface = ue_pfm.get_current_platform_interface()
@@ -49,6 +50,24 @@ def is_valid_engine_root_directory(engineRoot):
 def get_project_name_from_project_file_path(filePath):
     if filePath.endswith(project.UPROJECT_EXTENSION):
         return os.path.splitext(os.path.basename(filePath))[0]
+
+def get_engine_version_from_root_dir(engineRoot):
+    fullVersionFilePath = os.path.join(engineRoot, RELATIVE_VERSION_FILE_PATH)
+    versionMajor = None
+    versionMinor = None
+    versionPatch = None
+    if os.path.isfile(fullVersionFilePath):
+        with open(fullVersionFilePath) as f:
+            datafile = f.readlines()
+            for line in datafile:
+                # Just hack instead of c++ preprocessor
+                if versionMajor is None and '#define' in line and 'ENGINE_MAJOR_VERSION' in line:
+                    versionMajor = [s for s in line.split() if s.isdigit()][-1]
+                if versionMinor is None and '#define' in line and 'ENGINE_MINOR_VERSION' in line:
+                    versionMinor = [s for s in line.split() if s.isdigit()][-1]
+                if versionPatch is None and '#define' in line and 'ENGINE_PATCH_VERSION' in line:
+                    versionPatch = [s for s in line.split() if s.isdigit()][-1]
+    return versionMajor, versionMinor, versionPatch
 
 def is_valid_uproject_file(filePath):
     #logging.debug("is_valid_uproject_file " + filePath + " " + str(get_project_name_from_project_file_path(filePath)))

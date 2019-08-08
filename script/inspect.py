@@ -71,8 +71,10 @@ class Inspector:
             enginePath = ue_path.get_engine_path(projectFilePath)
             logging.info("Engine Path: " + str(enginePath))
 
-            buildApps = ue_proj.get_project_build_apps(projectRootPath)
-            logging.info("Build applications: " + str(buildApps))
+            versionMajor, versionMinor, versionPatch = ue_path.get_engine_version_from_root_dir(enginePath)
+            engineVersion = str(versionMajor) + '.' + str(versionMinor) + '.' + str(versionPatch)
+            logging.info("Engine version: " + str(engineVersion))
+
             buildTargets = ue_proj.get_project_build_targets(projectRootPath)
             logging.info("Build targets: " + str(buildTargets))
         else:
