@@ -10,7 +10,7 @@ import common as cm
 from ue import path as ue_path
 from ue import project as ue_proj
 
-DEFAULT_APP = "Editor"
+DEFAULT_TARGET = "Editor"
 DEFAULT_CONFIG = "Development"
 DEFAULT_PLATFORM = "Win64"
 
@@ -40,11 +40,11 @@ class ProjectBuilder:
     def run(self):
         initResult = self.init()
         if initResult:
-            buildFilePath, projectFilePath, appArg, configArg, platformArg = initResult
-            self.run_build(buildFilePath, projectFilePath, appArg, configArg, platformArg)
+            buildFilePath, projectFilePath, targetArg, configArg, platformArg = initResult
+            self.run_build(buildFilePath, projectFilePath, targetArg, configArg, platformArg)
 
     def init(self):
-        sourceArg, appArg, configArg, platformArg = self.process_args()
+        sourceArg, targetArg, configArg, platformArg = self.process_args()
         logging.debug("Input SourcePath: " + str(sourceArg))
         sourcePath = ue_path.get_project_root_path_from_path(sourceArg)
         logging.debug("Actual SourcePath: " + str(sourcePath))
@@ -59,7 +59,7 @@ class ProjectBuilder:
                     buildFilePath = os.path.normpath(os.path.join(enginePath, ue_path.get_relative_build_file_path()))
                     logging.debug("BuildFilePath: " + str(buildFilePath))
                     if buildFilePath and os.path.isfile(buildFilePath):
-                        return buildFilePath, projectFilePath, appArg, configArg, platformArg
+                        return buildFilePath, projectFilePath, targetArg, configArg, platformArg
                     else:
                         logging.warning("BuildFilePath is invalid: " + str(buildFilePath))
                 else:
@@ -77,9 +77,9 @@ class ProjectBuilder:
         parser.add_argument("-s", "--source", dest="source",
                             help="directory inside of UE project or build, set by user, overrides value of 'shellsource' aurgument", 
                             metavar="SOURCE")
-        parser.add_argument("-a", "--app", dest="app", nargs='+', default = DEFAULT_APP,
-                            help="application[s] to build. Use inspect script to find available apps. Use 'all' to build all available apps.", 
-                            metavar="APP")
+        parser.add_argument("-t", "--target", dest="target", nargs='+', default = DEFAULT_TARGET,
+                            help="targets[s] to build. Use inspect script to find available targets. Use 'all' to build all available targets.", 
+                            metavar="TARGET")
         parser.add_argument("-c", "--config", dest="config", nargs='+', default = DEFAULT_CONFIG,
                             help=("configuration type from " + str(ue_proj.ALL_CONFIGURATIONS)), metavar="CONFIG")
         parser.add_argument("-p", "--platform", dest="platform", nargs='+', default = DEFAULT_PLATFORM,
@@ -102,20 +102,20 @@ class ProjectBuilder:
         if not parsedArgs.source:
             parsedArgs.source = parsedArgs.shellsource
 
-        return parsedArgs.source, parsedArgs.app, parsedArgs.config, parsedArgs.platform
+        return parsedArgs.source, parsedArgs.target, parsedArgs.config, parsedArgs.platform
 
-    def get_app_arg(projectName, app):
-        appArg = ue_proj.create_build_name(projectName, app)
-        logging.debug("App arg: " + str(appArg))
-        return appArg
+    def get_target_arg(projectName, target):
+        targetArg = ue_proj.create_build_name(projectName, target)
+        logging.debug("Target arg: " + str(targetArg))
+        return targetArg
 
-    def run_build(self, buildFilePath, projectFilePath, appArg, configArg, platformArg):
-        logging.debug("Run build: " + str([buildFilePath, projectFilePath, appArg, configArg, platformArg, self.onlyDebug]))
+    def run_build(self, buildFilePath, projectFilePath, targetArg, configArg, platformArg):
+        logging.debug("Run build: " + str([buildFilePath, projectFilePath, targetArg, configArg, platformArg, self.onlyDebug]))
         projectName = ue_path.get_project_name_from_project_file_path(projectFilePath)
         projectPath = os.path.dirname(projectFilePath)
 
-        applications = get_real_arg_values_list(appArg, ue_proj.get_project_build_apps(projectPath), "application")
-        if not applications:
+        targets = get_real_arg_values_list(targetArg, ue_proj.get_project_build_targets(projectPath), "target")
+        if not targets:
             return
 
         configurations = get_real_arg_values_list(configArg, ue_proj.ALL_CONFIGURATIONS, "configuration")
@@ -128,19 +128,19 @@ class ProjectBuilder:
 
         logging.info("\nBuild platforms: " + str(platforms))
         logging.info("Build configurations: " + str(configurations))
-        logging.info("Build applications: " + str(applications) + "\n")
+        logging.info("Build targets: " + str(targets) + "\n")
 
         for platform in platforms:
             logging.info("\n################################### Building " + platform + " platform ###################################\n")
             for config in configurations:
-                for app in applications:
-                    self.run_single_build(buildFilePath, projectFilePath, projectName, config, app, platform)
+                for target in targets:
+                    self.run_single_build(buildFilePath, projectFilePath, projectName, config, target, platform)
 
-    def run_single_build(self, buildFilePath, projectFilePath, projectName, config, app, platform):
-        logging.info("\n----------------------------------- Building " + platform + "_" + config + "_" + app.capitalize() + " -----------------------------------\n")
-        buildApp = ProjectBuilder.get_app_arg(projectName, app);
+    def run_single_build(self, buildFilePath, projectFilePath, projectName, config, target, platform):
+        logging.info("\n----------------------------------- Building " + platform + "_" + config + "_" + target.capitalize() + " -----------------------------------\n")
+        buildTarget = ProjectBuilder.get_target_arg(projectName, target);
 
-        command = [buildFilePath, buildApp, platform, config, projectFilePath]
+        command = [buildFilePath, buildTarget, platform, config, projectFilePath]
 
         if self.nonUnity:
             command.append(DISABLE_UNITY_BUILD_ARG)

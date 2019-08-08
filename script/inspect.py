@@ -73,14 +73,16 @@ class Inspector:
 
             buildApps = ue_proj.get_project_build_apps(projectRootPath)
             logging.info("Build applications: " + str(buildApps))
+            buildTargets = ue_proj.get_project_build_targets(projectRootPath)
+            logging.info("Build targets: " + str(buildTargets))
         else:
             logging.warning("ProjectFilePath is invalid: " + str(projectFilePath))
 
     def inspectBuild(self, buildRootPath):
         buildName = ue_path.get_build_name_from_path(buildRootPath)
-        projectName, app = ue_proj.split_build_name(buildName)
-        logging.info("ProjectName: " + projectName)
-        logging.info("App: " + app)
+        projectName, target = ue_proj.split_build_name(buildName)
+        logging.info("ProjectName: " + str(projectName))
+        logging.info("Target: " + str(target))
 
 
 def main():

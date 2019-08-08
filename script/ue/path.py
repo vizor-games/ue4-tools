@@ -129,11 +129,6 @@ def get_build_root_path_from_path(somePath, platform=None):
 
 def get_engine_id(projectFile):
     #EngineAssociation": "4.20"
-    platformInterface = ue_pfm.get_current_platform_interface()
-    if not platformInterface:
-        logging.error("Platform interface is None")
-        return None
-    
     with open(projectFile) as projectCfg:
         data = json.load(projectCfg)
         if 'EngineAssociation' in data:
