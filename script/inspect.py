@@ -13,16 +13,15 @@ from ue import project as ue_proj
 
 class Inspector:
     def run(self):
-        initResult = self.init()
-        if initResult:
-            sourcePath = initResult
-            self.inspect(sourcePath)
+        sourcePath, settings = self.init()
+        if sourcePath:
+            self.inspect(sourcePath, settings)
 
     def init(self):
-        sourcePath = self.process_args()
+        sourcePath, settings = self.process_args()
         logging.debug("Input SourcePath: " + str(sourcePath))
         if os.path.isdir(sourcePath):
-            return sourcePath
+            return sourcePath, settings
         else:
             logging.warning("SourcePath is invalid: " + str(sourcePath))
 
@@ -44,9 +43,9 @@ class Inspector:
         if not parsedArgs.source:
             parsedArgs.source = parsedArgs.shellsource
 
-        return parsedArgs.source
+        return parsedArgs.source, parsedArgs
 
-    def inspect(self, sourcePath):
+    def inspect(self, sourcePath, settings):
         projectRootPath = ue_path.get_project_root_path_from_path(sourcePath)
         if projectRootPath:
             logging.debug("Found UE project root directory, using it '" + projectRootPath + "'");
