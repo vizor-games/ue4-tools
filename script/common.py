@@ -23,12 +23,12 @@ def init_arg_parser(parser):
 # Custom logs formatter
 class LogFormatter(logging.Formatter):
     FORMATTERS = {
-        logging.CRITICAL : logging.Formatter("!!!PIZDETS!!!: %(module)s: %(lineno)d: %(msg)s"),
-        logging.ERROR: logging.Formatter("ERROR: %(module)s: %(lineno)d: %(msg)s"),
-        logging.WARNING: logging.Formatter("WARNING: %(module)s: %(lineno)d: %(msg)s"),
-        logging.DEBUG: logging.Formatter("DBG: %(module)s: %(lineno)d: %(msg)s"),
+        logging.CRITICAL : logging.Formatter("!!!PIZDETS!!!: %(module)s.py_%(lineno)d: %(msg)s"),
+        logging.ERROR: logging.Formatter("ERROR: %(module)s.py_%(lineno)d: %(msg)s"),
+        logging.WARNING: logging.Formatter("WARNING: %(module)s.py_%(lineno)d: %(msg)s"),
+        logging.DEBUG: logging.Formatter("DBG: %(module)s.py_%(lineno)d: %(msg)s"),
         "DEFAULT": logging.Formatter("%(msg)s"),
-        "DEFAULT_DEBUG": logging.Formatter("%(module)s: %(lineno)d: %(msg)s"),
+        "DEFAULT_DEBUG": logging.Formatter("%(module)s.py_%(lineno)d: %(msg)s"),
     }
 
     def __init__(self, fmt="%(levelno)s: %(msg)s"):
