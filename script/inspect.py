@@ -9,6 +9,7 @@ import json
 import common as cm
 from ue import path as ue_path
 from ue import project as ue_proj
+from ue import context as ue_context
 
 
 class Inspector:
@@ -46,45 +47,11 @@ class Inspector:
         return parsedArgs.source, parsedArgs
 
     def inspect(self, sourcePath, settings):
-        projectRootPath = ue_path.get_project_root_path_from_path(sourcePath)
-        if projectRootPath:
-            logging.debug("Found UE project root directory, using it '" + projectRootPath + "'");
-            self.inspectProject(projectRootPath)
+        context = ue_context.get_context_interface(sourcePath)
+        if context:
+            context.inspect(settings)
         else:
-            buildRootPath = ue_path.get_build_root_path_from_path(sourcePath)
-            if buildRootPath:
-                logging.debug("Found UE build root directory, using it '" + buildRootPath + "'");
-                self.inspectBuild(buildRootPath)
-
-    def inspectProject(self, projectRootPath):
-        projectName = ue_path.get_project_name_from_path(projectRootPath)
-        logging.info("Project Name: " + str(projectName))
-        
-        projectFilePath = ue_path.get_project_file_path_from_repo_path(projectRootPath)
-        logging.debug("ProjectFilePath: " + str(projectFilePath))
-
-        if projectFilePath and os.path.isfile(projectFilePath):
-            engineId = ue_path.get_engine_id(projectFilePath)
-            logging.info("Engine Id: " + str(engineId))
-            
-            enginePath = ue_path.get_engine_path(projectFilePath)
-            logging.info("Engine Path: " + str(enginePath))
-
-            versionMajor, versionMinor, versionPatch = ue_path.get_engine_version_from_root_dir(enginePath)
-            engineVersion = str(versionMajor) + '.' + str(versionMinor) + '.' + str(versionPatch)
-            logging.info("Engine version: " + str(engineVersion))
-
-            buildTargets = ue_proj.get_project_build_targets(projectRootPath)
-            logging.info("Build targets: " + str(buildTargets))
-        else:
-            logging.warning("ProjectFilePath is invalid: " + str(projectFilePath))
-
-    def inspectBuild(self, buildRootPath):
-        buildName = ue_path.get_build_name_from_path(buildRootPath)
-        projectName, target = ue_proj.split_build_name(buildName)
-        logging.info("ProjectName: " + str(projectName))
-        logging.info("Target: " + str(target))
-
+            logging.warning("No context found for the path " + str(sourcePath))
 
 def main():
     print("Inspect Unreal Engine project/build")
