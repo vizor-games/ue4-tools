@@ -16,9 +16,16 @@ class UePlatformBase:
         logging.error("get_launcher_installations_file_path NOT IMPLEMENTED")
         return ""
 
-    def enumerate_engine_installations(self):
-        logging.error("enumerate_engine_installations NOT IMPLEMENTED")
+    def get_source_engine_installations(self):
+        logging.error("get_source_engine_installations NOT IMPLEMENTED")
         return {}
+
+    def get_all_engine_installations(self):
+        launcherEngineInstallations = self.get_launcher_engine_installations()
+        sourceEngineInstallations = self.get_source_engine_installations()
+        engineInstallations = {**launcherEngineInstallations, **sourceEngineInstallations}
+        logging.debug("All engine installations: " + str(engineInstallations))
+        return engineInstallations
 
     def read_launcher_installations(self):
         installations = {}

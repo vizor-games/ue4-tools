@@ -20,11 +20,11 @@ class UePlatformWindows(UePlatformBase):
     def get_launcher_installations_file_path(self):
         return os.path.join(self.get_launcher_settings_path(), "LauncherInstalled.dat")
 
-    def enumerate_engine_installations(self):
-        engineInstallations = self.get_launcher_engine_installations()
-
+    def get_source_engine_installations(self):
+        engineInstallations = {}
         userKeyPath = win32con.HKEY_CURRENT_USER
         regKeyHandle = None
+
         try:
             regKeyHandle = win32api.RegOpenKeyEx(userKeyPath, INSTALLATION_SUB_KEY, 0, win32con.KEY_READ)
             uniqueDirectories = [item[1] for item in engineInstallations]
@@ -55,9 +55,8 @@ class UePlatformWindows(UePlatformBase):
             if regKeyHandle is not None:
                 win32api.RegCloseKey(regKeyHandle)
                 #regKeyHandle.Close()
-
-        logging.debug("EngineInstallations: " + str(engineInstallations))
-
+        
+        logging.debug("Source engine installations: " + str(engineInstallations))
         return engineInstallations
 
     def is_build_exe_file(self, filePath):

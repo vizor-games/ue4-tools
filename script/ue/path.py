@@ -18,7 +18,7 @@ def get_engine_root_dir_from_identifier(identifier):
         return None
 
     logging.debug("identifier: " + str(identifier))
-    engineInstallations = platformInterface.enumerate_engine_installations()
+    engineInstallations = platformInterface.get_all_engine_installations()
     return engineInstallations.get(identifier)
 
 def get_engine_identifier_from_root_dir(inRootDir):
@@ -28,14 +28,13 @@ def get_engine_identifier_from_root_dir(inRootDir):
         return None
 
     logging.debug("inRootDir: " + str(identifier))
-    engineInstallations = platformInterface.enumerate_engine_installations()
+    engineInstallations = platformInterface.get_all_engine_installations()
     for identifier, rootDir in engineInstallations.items():
         if inRootDir == rootDir:
             return identifier
-    return None
 
 def is_valid_engine_root_directory(engineRoot):
-    binariesDir = os.path.normpath(os.path.join(engineRoot, "Engine/Binaries"))
+    binariesDir = os.path.normpath(os.path.join(engineRoot, 'Engine/Binaries'))
     hasBinariesDir = os.path.isdir(binariesDir)
     if not hasBinariesDir:
         logging.debug(engineRoot + " is not a valid engine root directory because " + binariesDir + " is absent")
@@ -87,7 +86,7 @@ def is_valid_project_root_directory(somePath):
     return (uprojectFileName != None)
 
 def get_project_file_name_from_repo_path(projectPath):
-    for fileName in _get_files(projectPath):
+    for fileName in get_files(projectPath):
         if is_valid_uproject_file(fileName):
             return fileName
 
@@ -122,16 +121,15 @@ def is_build_exe_file(filePath, platform=None):
     return any(pi.is_build_exe_file(filePath) for pi in platformInterfaces)
 
 def get_build_name_from_path(somePath, platform=None):
-    engineBinariesDir = os.path.normpath(os.path.join(somePath, "Engine/Binaries"))
-    childDirs = _get_child_dirs(somePath)
+    engineBinariesDir = os.path.normpath(os.path.join(somePath, 'Engine/Binaries'))
+    childDirs = get_child_dirs(somePath)
     if os.path.isdir(engineBinariesDir):
-        for fileName in [fn for fn in _get_files(somePath) if is_build_exe_file(fn, platform)]:
+        for fileName in [fn for fn in get_files(somePath) if is_build_exe_file(fn, platform)]:
             fileNameNoExt = os.path.splitext(os.path.basename(fileName))[0]
             projectName = project.split_build_name(fileNameNoExt)[0]
             if projectName in childDirs:
-                if all((dir in _get_child_dirs(os.path.join(somePath, projectName))) for dir in ['Binaries', 'Content']):
+                if all((dir in get_child_dirs(os.path.join(somePath, projectName))) for dir in ['Binaries', 'Content']):
                     return fileNameNoExt
-    return None
 
 def is_valid_build_root_directory(somePath, platform=None):
     return get_build_name_from_path(somePath, platform)
@@ -165,10 +163,10 @@ def get_project_target_files(projectPath):
     if os.path.isdir(sourcePath):
         return [fn for fn in _get_files(sourcePath) if fn.endswith(TARGET_FILE_ENDING)]
 
-def _get_child_dirs(somePath):
+def get_child_dirs(somePath):
     return [dir for dir in os.listdir(somePath) if os.path.isdir(os.path.join(somePath, dir))]
 
-def _get_files(somePath):
+def get_files(somePath):
     return [fileName for fileName in os.listdir(somePath) if os.path.isfile(os.path.join(somePath, fileName))]
 
 def get_relative_build_file_path():
