@@ -10,7 +10,39 @@ import json
 ConfigExtension = ".cfg"
 LogExtension = ".log"
 
-InstallationsSubKey = "SOFTWARE/Epic Games/Unreal Engine/Builds"
+class ColorEscapeStrings: 
+    RESET='\033[0m'
+    BOLD='\033[01m'
+    DISABLE='\033[02m'
+    UNDERLINE='\033[04m'
+    REVERSE='\033[07m'
+    STRIKE_THROUGH='\033[09m'
+    INVISIBLE='\033[08m'
+    class ForeGround: 
+        BLACK='\033[30m'
+        RED='\033[31m'
+        GREEN='\033[32m'
+        ORANGE='\033[33m'
+        BLUE='\033[34m'
+        PURPLE='\033[35m'
+        CYAN='\033[36m'
+        LIGHT_GREY='\033[37m'
+        DARK_GREY='\033[90m'
+        LIGHT_RED='\033[91m'
+        LIGHT_GREEN='\033[92m'
+        YELLOW='\033[93m'
+        LIGHT_BLUE='\033[94m'
+        PINK='\033[95m'
+        LIGHT_CYAN='\033[96m'
+    class BackGround: 
+        BLACK='\033[40m'
+        RED='\033[41m'
+        GREEN='\033[42m'
+        ORANGE='\033[43m'
+        BLUE='\033[44m'
+        PURPLE='\033[45m'
+        CYAN='\033[46m'
+        LIGHT_GREY='\033[47m'
 
 def init_arg_parser(parser):
     parser.add_argument("-d", "--debug",
@@ -23,22 +55,36 @@ def init_arg_parser(parser):
 # Custom logs formatter
 class LogFormatter(logging.Formatter):
     FORMATTERS = {
-        logging.CRITICAL : logging.Formatter("!!!PIZDETS!!!: %(module)s.py_%(lineno)d: %(msg)s"),
-        logging.ERROR: logging.Formatter("ERROR: %(module)s.py_%(lineno)d: %(msg)s"),
-        logging.WARNING: logging.Formatter("WARNING: %(module)s.py_%(lineno)d: %(msg)s"),
-        logging.DEBUG: logging.Formatter("DBG: %(module)s.py_%(lineno)d: %(msg)s"),
-        "DEFAULT": logging.Formatter("%(msg)s"),
-        "DEFAULT_DEBUG": logging.Formatter("%(module)s.py_%(lineno)d: %(msg)s"),
+        logging.CRITICAL: "!!!PIZDETS!!!: %(module)s.py_%(lineno)d: %(msg)s",
+        logging.ERROR   : "ERROR: %(module)s.py_%(lineno)d: %(msg)s",
+        logging.WARNING : "WARNING: %(module)s.py_%(lineno)d: %(msg)s",
+        logging.DEBUG    : "DBG: %(module)s.py_%(lineno)d: %(msg)s",
+        "DEFAULT"       : "%(msg)s",
+        "DEFAULT_DEBUG" : "%(module)s.py_%(lineno)d: %(msg)s",
     }
 
-    def __init__(self, fmt="%(levelno)s: %(msg)s"):
+    COLORS = {
+        logging.CRITICAL: ColorEscapeStrings.ForeGround.PURPLE,
+        logging.ERROR   : ColorEscapeStrings.ForeGround.RED,
+        logging.WARNING : ColorEscapeStrings.ForeGround.YELLOW,
+        logging.DEBUG   : ColorEscapeStrings.ForeGround.DARK_GREY,
+    }
+
+    def __init__(self, fmt="%(levelno)s: %(msg)s", use_color = True):
         logging.Formatter.__init__(self, fmt)
+        self.use_color = use_color
 
     def format(self, record):
         defaultFormat = self.FORMATTERS['DEFAULT']
         if logging.root.level == logging.DEBUG:
             defaultFormat = self.FORMATTERS['DEFAULT_DEBUG']
-        formatter = self.FORMATTERS.get(record.levelno, self.FORMATTERS['DEFAULT'])
+        formatterStr = self.FORMATTERS.get(record.levelno, self.FORMATTERS['DEFAULT'])
+
+        if self.use_color and record.levelno in self.COLORS:
+            colorFormat = self.COLORS[record.levelno] + '{}' + ColorEscapeStrings.RESET
+            formatterStr = colorFormat.format(formatterStr)
+
+        formatter = logging.Formatter(formatterStr)
         return formatter.format(record)
 
 def process_parsed_args(ParsedArgs):
