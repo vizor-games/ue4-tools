@@ -51,6 +51,9 @@ def init_arg_parser(parser):
     parser.add_argument("-dd", "--onlydebug",
                         action="store_true", dest="onlyDebug", default=False,
                         help="is this only debug run with applying any changes")
+    parser.add_argument("-nc", "--nocolor",
+                        action="store_true", dest="noColor", default=False,
+                        help="disable color output")
 
 # Custom logs formatter
 class LogFormatter(logging.Formatter):
@@ -88,7 +91,7 @@ class LogFormatter(logging.Formatter):
         return formatter.format(record)
 
 def process_parsed_args(ParsedArgs):
-    fmt = LogFormatter()
+    fmt = LogFormatter(use_color = not ParsedArgs.noColor)
     hdlr = logging.StreamHandler(sys.stdout)
 
     hdlr.setFormatter(fmt)
