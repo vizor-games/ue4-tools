@@ -53,7 +53,7 @@ class ProjectBuilder:
             projectFilePath = ue_path.get_project_file_path_from_repo_path(sourcePath)
             logging.debug("ProjectFilePath: " + str(projectFilePath))
             if projectFilePath and os.path.isfile(projectFilePath):
-                enginePath = ue_path.get_engine_path(projectFilePath)
+                enginePath = ue_path.get_engine_root_path(projectFilePath)
                 logging.debug("EnginePath: " + str(enginePath))
                 if enginePath and os.path.isdir(enginePath):
                     buildFilePath = os.path.normpath(os.path.join(enginePath, ue_path.get_relative_build_file_path()))
@@ -84,6 +84,9 @@ class ProjectBuilder:
                             help=("configuration type from " + str(ue_proj.ALL_CONFIGURATIONS)), metavar="CONFIG")
         parser.add_argument("-p", "--platform", dest="platform", nargs='+', default = DEFAULT_PLATFORM,
                             help=("platform type from " + str(ue_proj.ALL_PLATFORMS)), metavar="PLATFORM")
+        parser.add_argument("-def", "--definitions", dest="definitions", nargs='+',
+                            help="Definition for compiler.", 
+                            metavar="DEFINITIONS")
         parser.add_argument("-nu", "--nonunity",
                             action="store_true", dest="nonUnity", default=False,
                             help="non-unity build")
@@ -95,6 +98,7 @@ class ProjectBuilder:
         self.onlyDebug = cm.process_parsed_args(parsedArgs)
         self.nonUnity = parsedArgs.nonUnity
         self.noPrecompiledHeaders = parsedArgs.noPrecompiledHeaders
+        self.definitions = parsedArgs.definitions
 
         logging.debug("Parsing arguments: '" + ' '.join(sys.argv[1:]) + "'")
         logging.debug("Result is: " + str(parsedArgs))
@@ -141,6 +145,9 @@ class ProjectBuilder:
         buildTarget = ProjectBuilder.get_target_arg(projectName, target);
 
         command = [buildFilePath, buildTarget, platform, config, projectFilePath]
+
+        if self.definitions:
+            command.append("-define:" + str(' '.join(self.definitions)))
 
         if self.nonUnity:
             command.append(DISABLE_UNITY_BUILD_ARG)
