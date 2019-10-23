@@ -7,12 +7,15 @@ from ue import platform as ue_pfm
 from ue import project
 
 SOURCE_PATH = "Source"
+PLUGINS_PATH = "Plugins"
+PLUGIN_FILE_EXTENSION = ".uplugin"
 LOGS_PATH = "Saved/Logs"
 TARGET_FILE_ENDING = ".Target.cs"
 
 ENGINE_DIR = "Engine"
 ENGINE_SOURCE_DIR = os.path.join(ENGINE_DIR, "Source")
 ENGINE_SOURCE_RUNTIME_DIR = os.path.join(ENGINE_DIR, "Source")
+ENGINE_PLUGINS_DIR = os.path.join(ENGINE_DIR, "Plugins")
 VERSION_FILE_PATH = "Engine/Source/Runtime/Launch/Resources/Version.h"
 
 def get_engine_root_dir_from_identifier(identifier):
@@ -168,10 +171,57 @@ def get_engine_engine_path(projectFile):
     engineRootPath = get_engine_root_path(projectFile)
     if os.path.isdir(engineRootPath):
         return os.path.join(engineRootPath, ENGINE_DIR)
+
+def get_engine_plugins_path(projectFile):
+    #return "e:/projects/Unreal/4_20/Engine/Plugins"
+    #return "e:/prog/Epic/UE_4.20/Engine/Plugins"
+    engineRootPath = get_engine_root_path(projectFile)
+    if os.path.isdir(engineRootPath):
+        return os.path.join(engineRootPath, ENGINE_PLUGINS_DIR)
+
 def get_project_target_files(projectPath):
     sourcePath = os.path.abspath(os.path.join(projectPath, SOURCE_PATH))
     if os.path.isdir(sourcePath):
         return [fn for fn in get_files(sourcePath) if fn.endswith(TARGET_FILE_ENDING)]
+
+def read_plugins_from_directory(parentDirPath):
+    plugins = {}
+    if os.path.isdir(parentDirPath):
+        for pluginDir in get_child_dirs(parentDirPath):
+            pluginPath = os.path.join(parentDirPath, pluginDir)
+            pluginFiles = [fn for fn in get_files(pluginPath) if fn.endswith(PLUGIN_FILE_EXTENSION)]
+            #logging.debug("In directory '" + str(pluginPath) + "', plugin files " + str(pluginFiles))
+            if len(pluginFiles) > 1:
+                logging.warning("More then one plugin file in directory '" + str(pluginPath) + "', choosing '" + str(pluginFiles[0]) + "'")
+            if pluginFiles:
+                pluginName = os.path.splitext(os.path.basename(pluginFiles[0]))[0]
+                plugins[pluginName] = { 'Path' : pluginFiles[0], 'Enabled' : False }
+            else:
+                plugins = {**plugins, **read_plugins_from_directory(pluginPath)}
+    return plugins
+
+def get_plugins_directory(projectPath):
+    return os.path.join(projectPath, PLUGINS_PATH)
+
+def get_plugin_path(projectPath, pluginName):
+    return os.path.join(get_plugins_directory(projectPath), pluginName)
+
+def is_valid_plugin_directory(pluginPath):
+    pluginFilePath = os.path.normpath(os.path.join(pluginPath, os.path.basename(pluginPath) + PLUGIN_FILE_EXTENSION)) 
+    hasPluginFile = os.path.isfile(pluginFilePath)
+
+    contentDir = os.path.normpath(os.path.join(pluginPath, 'Content'))
+    hasContentDir = os.path.isdir(contentDir)
+
+    sourceDir = os.path.normpath(os.path.join(pluginPath, 'Source'))
+    hasSourceDir = os.path.isdir(sourceDir)
+
+    isValidPluginDir = hasPluginFile and (hasContentDir or hasSourceDir)
+
+    if not isValidPluginDir:
+        logging.debug(pluginPath + " is not a valid plugin directory " + contentDir + " " + sourceDir)
+    
+    return isValidPluginDir
 
 def get_child_dirs(somePath):
     return [dir for dir in os.listdir(somePath) if os.path.isdir(os.path.join(somePath, dir))]

@@ -40,6 +40,31 @@ class UeContextProject(UeContextBase):
 
             buildTargets = ue_proj.get_build_targets(self.rootPath)
             logging.info("Build targets: " + str(buildTargets))
+
+            if settings.plugins or settings.projectPlugins or settings.allPlugins:
+
+                plugins = ue_proj.get_project_plugins(self.rootPath)
+
+                enabledPluginNames = [pluginName for pluginName in plugins if plugins[pluginName]['Enabled'] == True]
+                if enabledPluginNames:
+                    logging.info("Enabled plugins:")
+                    for pluginName in enabledPluginNames:
+                        pluginInfo = plugins[pluginName]
+                        dbgStr = "   " + pluginName
+                        if pluginInfo['Source'] == 'Engine':
+                            dbgStr += " (Engine)"
+                        logging.info(dbgStr)
+
+                disabledPluginNames = [pluginName for pluginName in plugins if plugins[pluginName]['Enabled'] == False]
+                if disabledPluginNames and (settings.projectPlugins or settings.allPlugins):
+                    logging.info("Available plugins:")
+                    for pluginName in disabledPluginNames:
+                        pluginInfo = plugins[pluginName]
+                        if settings.allPlugins or pluginInfo.get('InProjectFile'):
+                            dbgStr = "   " + pluginName
+                            if pluginInfo['Source'] == 'Engine':
+                                dbgStr += " (Engine)"
+                            logging.info(dbgStr)
         else:
             logging.warning("ProjectFilePath is invalid: " + str(projectFilePath))
 

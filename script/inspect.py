@@ -34,6 +34,12 @@ class Inspector:
         parser.add_argument("-s", "--source", dest="source",
                             help="directory inside of UE project or build, set by user, overrides value of 'shellsource' aurgument", 
                             metavar="SOURCE")
+        parser.add_argument("-p", "--plugins", dest="plugins", action="store_true", default=False,
+                            help="list enabled plugins (for project)")
+        parser.add_argument("-pp", "--projectplugins", dest="projectPlugins", action="store_true", default=False,
+                            help="list enabled plugins and disabled plugins mentioned in project file (for project)")
+        parser.add_argument("-pa", "--allplugins", dest="allPlugins", action="store_true", default=False,
+                            help="list all available plugins (for project)")
 
         parsedArgs = parser.parse_args()
         self.onlyDebug = cm.process_parsed_args(parsedArgs)
