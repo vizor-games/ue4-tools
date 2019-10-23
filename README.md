@@ -47,6 +47,13 @@ Contributing
 
 We welcome any contributions. Please feel free to report known bugs, propose new features using Github's pull request system.
 
+Troubleshooting
+------------
+
+### Windows
+
+To fix **ImportError: DLL load failed: win32api**: After you installed the pywin32 libs, there is a directory "Lib/site-packages/pywin32_system32", which including three dll libs, copy them to the "/Lib/site-packages/win32" directory, which including the win32api.pyd or win32api.pyc.
+
 Links
 -----
 
