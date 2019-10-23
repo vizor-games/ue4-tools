@@ -50,7 +50,7 @@ class UeContextProject(UeContextBase):
                     logging.info("Enabled plugins:")
                     for pluginName in enabledPluginNames:
                         pluginInfo = plugins[pluginName]
-                        dbgStr = "   " + pluginName
+                        dbgStr = "\t" + pluginName
                         if pluginInfo['Source'] == 'Engine':
                             dbgStr += " (Engine)"
                         logging.info(dbgStr)
@@ -61,7 +61,7 @@ class UeContextProject(UeContextBase):
                     for pluginName in disabledPluginNames:
                         pluginInfo = plugins[pluginName]
                         if settings.allPlugins or pluginInfo.get('InProjectFile'):
-                            dbgStr = "   " + pluginName
+                            dbgStr = "\t" + pluginName
                             if pluginInfo['Source'] == 'Engine':
                                 dbgStr += " (Engine)"
                             logging.info(dbgStr)
