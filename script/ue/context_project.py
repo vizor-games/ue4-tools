@@ -31,14 +31,14 @@ class UeContextProject(UeContextBase):
             engineId = ue_path.get_engine_id(projectFilePath)
             logging.info("Engine Id: " + str(engineId))
             
-            enginePath = ue_path.get_engine_path(projectFilePath)
+            enginePath = ue_path.get_engine_root_path(projectFilePath)
             logging.info("Engine Path: " + str(enginePath))
 
             if enginePath:
                 contextEngine = UeContextEngine.construct(enginePath)
                 contextEngine.inspect(settings)
 
-            buildTargets = ue_proj.get_project_build_targets(self.rootPath)
+            buildTargets = ue_proj.get_build_targets(self.rootPath)
             logging.info("Build targets: " + str(buildTargets))
         else:
             logging.warning("ProjectFilePath is invalid: " + str(projectFilePath))

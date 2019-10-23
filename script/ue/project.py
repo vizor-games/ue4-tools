@@ -44,11 +44,11 @@ def create_build_name(projectName, targetName):
     else:
         return projectName + targetName.capitalize()
 
-def project_has_build_target(projectPath, buildTargetName):
-    buildTargets = get_project_build_targets(projectPath)
+def has_build_target(projectPath, buildTargetName):
+    buildTargets = get_build_targets(projectPath)
     return (buildTargetName in buildTargets)
 
-def get_project_build_targets(projectPath):
+def get_build_targets(projectPath):
     projectName = ue_path.get_project_name_from_path(projectPath)
     if projectName:
         targetFiles = ue_path.get_project_target_files(projectPath)

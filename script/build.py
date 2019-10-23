@@ -118,7 +118,7 @@ class ProjectBuilder:
         projectName = ue_path.get_project_name_from_project_file_path(projectFilePath)
         projectPath = os.path.dirname(projectFilePath)
 
-        targets = get_real_arg_values_list(targetArg, ue_proj.get_project_build_targets(projectPath), "target")
+        targets = get_real_arg_values_list(targetArg, ue_proj.get_build_targets(projectPath), "target")
         if not targets:
             return
 

@@ -9,7 +9,11 @@ from ue import project
 SOURCE_PATH = "Source"
 LOGS_PATH = "Saved/Logs"
 TARGET_FILE_ENDING = ".Target.cs"
-RELATIVE_VERSION_FILE_PATH = "Engine/Source/Runtime/Launch/Resources/Version.h"
+
+ENGINE_DIR = "Engine"
+ENGINE_SOURCE_DIR = os.path.join(ENGINE_DIR, "Source")
+ENGINE_SOURCE_RUNTIME_DIR = os.path.join(ENGINE_DIR, "Source")
+VERSION_FILE_PATH = "Engine/Source/Runtime/Launch/Resources/Version.h"
 
 def get_engine_root_dir_from_identifier(identifier):
     platformInterface = ue_pfm.get_current_platform_interface()
@@ -51,7 +55,7 @@ def get_project_name_from_project_file_path(filePath):
         return os.path.splitext(os.path.basename(filePath))[0]
 
 def get_engine_version_from_root_dir(engineRoot):
-    fullVersionFilePath = os.path.join(engineRoot, RELATIVE_VERSION_FILE_PATH)
+    fullVersionFilePath = os.path.join(engineRoot, VERSION_FILE_PATH)
     versionMajor = None
     versionMinor = None
     versionPatch = None
@@ -151,17 +155,23 @@ def get_engine_id(projectFile):
         if 'EngineAssociation' in data:
             return data['EngineAssociation']
 
-def get_engine_path(projectFile):
+def get_engine_root_path(projectFile):
     #return "e:/projects/Unreal/4_20"
     #return "e:/prog/Epic/UE_4.20"
     engineId = get_engine_id(projectFile)
     if engineId:
         return get_engine_root_dir_from_identifier(engineId)
 
+def get_engine_engine_path(projectFile):
+    #return "e:/projects/Unreal/4_20/Engine"
+    #return "e:/prog/Epic/UE_4.20/Engine"
+    engineRootPath = get_engine_root_path(projectFile)
+    if os.path.isdir(engineRootPath):
+        return os.path.join(engineRootPath, ENGINE_DIR)
 def get_project_target_files(projectPath):
     sourcePath = os.path.abspath(os.path.join(projectPath, SOURCE_PATH))
     if os.path.isdir(sourcePath):
-        return [fn for fn in _get_files(sourcePath) if fn.endswith(TARGET_FILE_ENDING)]
+        return [fn for fn in get_files(sourcePath) if fn.endswith(TARGET_FILE_ENDING)]
 
 def get_child_dirs(somePath):
     return [dir for dir in os.listdir(somePath) if os.path.isdir(os.path.join(somePath, dir))]
